@@ -41,13 +41,22 @@ let read_file (file_name : string) : string =
 let explode (s : string) : char list = String.to_seq s |> List.of_seq
 let implode (cs : char list) : string = List.to_seq cs |> String.of_seq
 
-let get_all_matches regexp s =
+let get_all_groups regexp s =
   let rec aux i =
     try
-    let m = Str.search_forward regexp s i in
-    let ms = Str.matched_group 0 s in
-    ms :: aux (m + String.length ms)
-    with Not_found -> []
+      let _ = Str.search_forward regexp s i in
+      let total = Str.matched_group 0 s in
+      
+      let rec gather_groups i =
+        try
+          let m = Str.matched_group i s in  
+          m :: gather_groups (i + 1)
+        with _ -> []  (* No more groups found *)
+      in
+      let groups = gather_groups 1 in  (* Start from group 1 to skip group 0, which is the entire match *)
+      (total, groups) :: aux (Str.match_end ())  
+      
+    with Not_found -> []  (* No more matches found *)
   in
   aux 0
 
@@ -105,7 +114,7 @@ let memo f =
       y
 
 (* recursive closure with lists instead of hashtable *)
-let memo_rec f =
+let memo_rec_list f =
   let m = ref [] in
   let rec g x =
     try
@@ -114,6 +123,18 @@ let memo_rec f =
     Not_found ->
       let y = f g x in
         m := (x, y) :: !m ;
+        y
+  in
+    g
+let memo_rec f =
+  let m = Hashtbl.create 10000 in
+  let rec g x =
+    try
+      Hashtbl.find m x
+    with
+    Not_found ->
+      let y = f g x in
+        Hashtbl.add m x y ;
         y
   in
     g
@@ -154,3 +175,37 @@ let rec takeDrop n = function
     let (xs', xs'') = takeDrop (n - 1) xs in
     (x :: xs', xs'')
   | xs -> ([], xs)
+
+let dropLast xs = List.rev (List.tl (List.rev xs)) 
+let zipNext xs =
+  List.combine (dropLast xs) (List.tl xs)
+
+let map_progress f xs =
+  let start_time = Sys.time () in
+  let interval = max 1 (List.length xs / 100) in
+  List.mapi (fun i x ->
+    (if i>0 && i mod interval = 0 then
+      let now = Sys.time () in
+      let elapsed = now -. start_time in
+      let estimated = elapsed /. (float_of_int (i+1)) *. (float_of_int (List.length xs)) in
+      Printf.printf "%d%% (%d/%d) elapsed: %.2fs estimated: %.2fs remaining: %.2fs\n%!" (i*100 / List.length xs) i (List.length xs) elapsed estimated (estimated -. elapsed));
+    f x
+  ) xs
+
+let rec transpose = function
+  | [] | []::_ -> []
+  | m -> List.map List.hd m :: transpose (List.map List.tl m)
+
+let tqdm_map f xs = 
+  let n = List.length xs in
+  let intermediate = n/100 in
+  let start = Sys.time () in
+  xs
+  |> List.mapi (fun i x ->
+    if i mod intermediate = 0 then
+      (let now = Sys.time () in
+      let elapsed = now -. start in
+      let remaining = elapsed /. float_of_int (i+1) *. float_of_int (n-i-1) in
+      Printf.printf "%d/%d (%d%%) - Elapsed: %.2fs - Remaining: %.2fs\n%!" i n (i*100/n) elapsed remaining);
+    f x
+  )
