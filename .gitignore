@@ -4,3 +4,5 @@ _build/
 *.exe
 *.out
 *.o
+inputs/*.txt
+!inputs/0_1.txt
