@@ -15,18 +15,6 @@ let data =
       (dir, steps)
     )
 
-(* let rec clamped_modulo n m =
-  if n = 0 then 
-    0, 1
-  else if n < 0 then
-    let r, c = clamped_modulo (n + m) m in
-    r, c + 1
-  else if n >= m then
-    let r, c = clamped_modulo (n - m) m in
-    r, c + 1
-  else
-    n, 0 *)
-
 let rec clamped_modulo2 n m =
   if 0 <= n && n < m then
     n, (if n = 0 then 1 else 0)
