@@ -209,3 +209,19 @@ let tqdm_map f xs =
       Printf.printf "%d/%d (%d%%) - Elapsed: %.2fs - Remaining: %.2fs\n%!" i n (i*100/n) elapsed remaining);
     f x
   )
+
+
+
+
+let enumerate xs = List.mapi (fun i x -> (i, x)) xs
+
+let zip_neighbors default grid =
+  let pad x l = x :: l @ [x] in
+  let rec map3 f a b c = match a, b, c with
+    | x::xs, y::ys, z::zs -> f x y z :: map3 f xs ys zs
+    | _ -> [] in
+  let slide f l = match l with _::t -> map3 f l t (List.tl t) | _ -> [] in
+  let triplet a b c = [a; b; c] in
+  let rows = List.map (pad default) grid in
+  let border = match rows with r::_ -> List.init (List.length r) (fun _ -> default) | [] -> [] in
+  slide (map3 triplet) (List.map (slide triplet) (border :: rows @ [border]))
