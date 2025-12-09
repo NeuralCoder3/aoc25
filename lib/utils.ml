@@ -162,6 +162,14 @@ let group_by ?(keep=false) p xs : 'a list list =
   in
   aux [] xs
 
+let group_map f xs =
+  let results = List.map (fun x -> (x, f x)) xs in
+  let groups = List.map snd results |> List.sort_uniq compare in
+  List.map (fun g ->
+    let members = results |> List.filter (fun (_, v) -> v = g) |> List.map fst in
+    (g, members)
+  ) groups
+
 let rec take n = function
   | x :: xs when n > 0 -> x :: take (n - 1) xs
   | _ -> []
