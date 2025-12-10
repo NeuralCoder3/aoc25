@@ -1,6 +1,6 @@
 FROM ocaml/opam
 
-RUN sudo apt install -y libglpk-dev z3 python3
+RUN sudo apt install -y libglpk-dev z3 python3 libgmp-dev pkg-config
 
 RUN opam pin lp --dev-repo && \
     opam pin lp-glpk --dev-repo && \
@@ -11,4 +11,4 @@ RUN opam pin lp --dev-repo && \
 RUN opam install ocaml-lsp-server ocamlformat merlin
 RUN opam user-setup install
 
-RUN opam install base batteries zarith
+RUN opam install base batteries zarith z3

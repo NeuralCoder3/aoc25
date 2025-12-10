@@ -2,9 +2,9 @@
  (public_name aoc)
  (name main)
  (libraries utils str 
-  ; smt
+  smt
   ; bignum
-  ; lp lp-glpk z3 
+  ; lp lp-glpk z3
  ))
 
 (env
