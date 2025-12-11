@@ -5,11 +5,11 @@
 )
 
 ; comment in to enable SMT support
-(library
- (name smt)
- (libraries str z3)
- (modules smt)
-)
+; (library
+;  (name smt)
+;  (libraries str z3)
+;  (modules smt)
+; )
 
 (env
   (dev
