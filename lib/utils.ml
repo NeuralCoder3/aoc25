@@ -233,3 +233,14 @@ let zip_neighbors default grid =
   let rows = List.map (pad default) grid in
   let border = match rows with r::_ -> List.init (List.length r) (fun _ -> default) | [] -> [] in
   slide (map3 triplet) (List.map (slide triplet) (border :: rows @ [border]))
+
+type ('a,'b) state = Continue of 'a | Stop of 'b
+
+let rec fold_until f acc xs =
+  match xs with
+  | [] -> acc
+  | x::xs ->
+    match f acc x with
+    | Continue acc' -> fold_until f acc' xs
+    | Stop res -> res
+

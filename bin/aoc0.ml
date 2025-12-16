@@ -1,6 +1,6 @@
 open Utils
 
-let data = 
+let data =
   "inputs/0_1.txt"
   |> read_lines
   |> List.map int_of_string
