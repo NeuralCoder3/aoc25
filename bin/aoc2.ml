@@ -27,16 +27,11 @@ let is_invalid id =
 let is_invalid_2 id =
   let str_id = string_of_int id in
   let length = String.length str_id in
-  List.init length (fun part_len ->
-    part_len > 0 &&
-    length mod part_len = 0 &&
-    let count = length / part_len in
-    let parts = List.init count (fun j ->
-      String.sub str_id (j * part_len) part_len
-    ) in
-    let first_part = List.hd parts in
-    List.for_all ((=) first_part) parts
-  )
+  List.init (length / 2) (fun i ->
+    let part_len = i + 1 in
+    length mod part_len = 0
+    && String.sub str_id 0 (length - part_len)
+       = String.sub str_id part_len (length - part_len))
   |> List.exists Fun.id
 
 
